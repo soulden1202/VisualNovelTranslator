@@ -50,7 +50,7 @@ class Backend(QObject):
         Translator = GeminiTranslator(os.getenv('GEMINI_API_KEY'), role + context)
         
         #For deepseek model
-        #Translator = DeepSeekTranslator(os.getenv('GEMINI_API_KEY'), role + context)
+        #Translator = DeepSeekTranslator(os.getenv('DEEPSEEK_API_KEY'), role + context)
                      
         last_sentence = ""
         
