@@ -8,6 +8,7 @@ Anyway this just a simple application I use to read untranslated visual novel be
 # Python
 To use this you first you need python installed, you can find installtion guide here:
 https://www.python.org/downloads/
+
 I planning to make a release later but for now you have to run it manually 
 
 # Textactor
