@@ -28,6 +28,11 @@ Window {
     modality: Qt.ApplicationModal
     flags: Qt.Dialog
     
+    // Add notification function
+    function showNotification(msg, type) {
+        settingsNotification.showNotification(msg, type)
+    }
+    
     Column {
         id: frame
         anchors.fill: parent
@@ -63,7 +68,7 @@ Window {
                     clip: false
                     text: "Color"
                     font.pixelSize: 20
-                    color: "black"
+                    color:  root.fontColor
                 }
             }
             
@@ -71,6 +76,7 @@ Window {
                 id: colorPreview
                 currentColor: root.fontColor
                 onColorClicked: {
+                    colorDialog.selectedColor = root.fontColor
                     textColorDialog.show()
                     colorDialog.open()
                 }
@@ -126,7 +132,7 @@ Window {
                 text: "Preview Text 予覧 123"
                 font.family: fontComboBox.currentText
                 font.pixelSize: 16
-                color: "black"
+                color: root.fontColor
             }
         }
         
@@ -206,12 +212,6 @@ Window {
             }
         }
         
-        Text {
-            text: "Note: App will restart when changing model"
-            font.pixelSize: 10
-            color: "#666666"
-        }
-        
         Rectangle {
             width: frame.width
             height: 2
@@ -263,12 +263,6 @@ Window {
                 }
             }
             
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                text: "Note: App will restart after saving"
-                font.pixelSize: 10
-                color: "#666666"
-            }
         }
         
         Rectangle {
@@ -280,10 +274,10 @@ Window {
         // Save button
         Button {
             height: 25
-            width: 50
+            width: 140
             anchors.right: parent.right
             anchors.rightMargin: 5
-            text: qsTr("Save")
+            text: qsTr("Save Size/Font settings")
             background: Rectangle {
                 color: parent.down ? "#bbbbbb" : (parent.hovered ? "#d6d6d6" : "#f6f6f6")
                 radius: 3
@@ -323,6 +317,133 @@ Window {
             onRejected: {
                 colorDialog.close()
                 textColorDialog.close()
+            }
+        }
+    }
+    
+    // Notification component - MUST BE LAST to render on top
+    Item {
+        id: settingsNotification
+        anchors.fill: parent
+        z: 10000
+        enabled: true
+        visible: true
+        
+        property string message: ""
+        property string notificationType: "success"
+        
+        function showNotification(msg, type) {
+            console.log("=== NOTIFICATION FUNCTION CALLED ===")
+            console.log("Message:", msg)
+            console.log("Type:", type)
+            console.log("notificationBox exists:", notificationBox)
+            console.log("notificationBox visible before:", notificationBox.visible)
+            console.log("notificationBox opacity before:", notificationBox.opacity)
+            
+            message = msg
+            notificationType = type || "success"
+            notificationBox.visible = true
+            notificationBox.opacity = 1
+            
+            console.log("notificationBox visible after:", notificationBox.visible)
+            console.log("notificationBox opacity after:", notificationBox.opacity)
+            console.log("notificationBox color:", notificationBox.color)
+            
+            hideTimer.restart()
+        }
+        
+        Rectangle {
+            id: notificationBox
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+                bottom: parent.bottom
+                bottomMargin: 20
+            }
+            width: Math.min(parent.width - 40, 350)
+            height: 60
+            radius: 8
+            visible: false
+            opacity: 0
+            enabled: true
+            
+            color: {
+                if (settingsNotification.notificationType === "success") return "#4CAF50"
+                if (settingsNotification.notificationType === "error") return "#F44336"
+                if (settingsNotification.notificationType === "info") return "#2196F3"
+                return "#4CAF50"
+            }
+            
+            Component.onCompleted: {
+                console.log("notificationBox created, parent:", parent)
+                console.log("notificationBox dimensions:", width, "x", height)
+            }
+            
+            // Drop shadow
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: -2
+                radius: parent.radius
+                color: "transparent"
+                border.color: "#00000040"
+                border.width: 2
+                z: -1
+            }
+            
+            Behavior on opacity {
+                NumberAnimation { duration: 300; easing.type: Easing.InOutQuad }
+            }
+            
+            Row {
+                anchors.fill: parent
+                anchors.margins: 16
+                spacing: 12
+                
+                Text {
+                    text: {
+                        if (settingsNotification.notificationType === "success") return "✓"
+                        if (settingsNotification.notificationType === "error") return "✗"
+                        if (settingsNotification.notificationType === "info") return "ⓘ"
+                        return "✓"
+                    }
+                    font.pixelSize: 24
+                    font.bold: true
+                    color: "#FFFFFF"
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+                
+                Text {
+                    width: parent.width - 40
+                    text: settingsNotification.message
+                    font.pixelSize: 14
+                    color: "#FFFFFF"
+                    wrapMode: Text.WordWrap
+                    elide: Text.ElideRight
+                    maximumLineCount: 2
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+        }
+        
+        Timer {
+            id: hideTimer
+            interval: 3000
+            running: false
+            repeat: false
+            onTriggered: {
+                console.log("Hide timer triggered")
+                notificationBox.opacity = 0
+                visibilityTimer.start()
+            }
+        }
+        
+        Timer {
+            id: visibilityTimer
+            interval: 300
+            running: false
+            repeat: false
+            onTriggered: {
+                console.log("Visibility timer triggered, hiding notification")
+                notificationBox.visible = false
             }
         }
     }

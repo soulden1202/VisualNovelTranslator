@@ -3,7 +3,7 @@ import QtQuick
 Rectangle {
     id: root
     
-    property string currentColor: "#FFFFFF"
+    property string currentColor: ""
     signal colorClicked()
     
     width: 60
