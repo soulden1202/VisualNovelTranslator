@@ -1,0 +1,55 @@
+"""
+Model Registry - Central place to register and manage translation models
+Add new models here to make them available in the settings
+"""
+
+from gemini_module import GeminiTranslator
+from deepseek_module import DeepSeekTranslator
+
+
+class ModelRegistry:
+    """Registry for managing available translation models"""
+    
+    # Define all available models here
+    # Format: 'Display Name': (Class, api_key_name)
+    MODELS = {
+        'Gemini': (GeminiTranslator, 'GEMINI_API_KEY'),
+        'DeepSeek': (DeepSeekTranslator, 'DEEPSEEK_API_KEY'),
+        # Add new models here:
+        # 'ModelName': (ModelClass, 'API_KEY_NAME'),
+    }
+    
+    @classmethod
+    def get_model_names(cls):
+        """Get list of available model names"""
+        return list(cls.MODELS.keys())
+    
+    @classmethod
+    def get_api_key_name(cls, model_name):
+        """Get the API key name for a model"""
+        if model_name not in cls.MODELS:
+            return None
+        return cls.MODELS[model_name][1]
+    
+    @classmethod
+    def create_translator(cls, model_name, prompt, api_key):
+        """Create a translator instance for the specified model"""
+        if model_name not in cls.MODELS:
+            raise ValueError(f"Unknown model: {model_name}. Available models: {cls.get_model_names()}")
+        
+        translator_class, _ = cls.MODELS[model_name]
+        
+        if not api_key:
+            raise ValueError(f"API key not set for {model_name}. Please add it in Settings > API Keys.")
+        
+        return translator_class(api_key, prompt)
+    
+    @classmethod
+    def is_valid_model(cls, model_name):
+        """Check if a model name is valid"""
+        return model_name in cls.MODELS
+    
+    @classmethod
+    def get_all_required_keys(cls):
+        """Get all API key names required by registered models"""
+        return list(set(key_name for _, key_name in cls.MODELS.values()))
