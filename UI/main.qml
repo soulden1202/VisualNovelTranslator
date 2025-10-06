@@ -61,6 +61,120 @@ ApplicationWindow {
         fontFamily: textFont
     }
     
+    // Compact notification for main window
+    Item {
+        id: mainNotification
+        anchors.fill: parent
+        z: 10000
+        
+        property string message: ""
+        property string notificationType: "success"
+        
+        function showNotification(msg, type) {
+            console.log("Main window notification:", msg, type)
+            message = msg
+            notificationType = type || "success"
+            
+            notificationBox.opacity = 0
+            notificationBox.visible = true
+            
+            Qt.callLater(function() {
+                notificationBox.opacity = 1
+            })
+            
+            hideTimer.restart()
+        }
+        
+        Rectangle {
+            id: notificationBox
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+                top: parent.top
+                topMargin: 10
+            }
+            width: Math.min(parent.width - 120, 400)
+            height: 35
+            radius: 17
+            visible: false
+            opacity: 0
+            
+            color: {
+                if (mainNotification.notificationType === "success") return "#4CAF50"
+                if (mainNotification.notificationType === "error") return "#F44336"
+                if (mainNotification.notificationType === "info") return "#2196F3"
+                return "#4CAF50"
+            }
+            
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: -2
+                radius: parent.radius
+                color: "transparent"
+                border.color: "#00000050"
+                border.width: 2
+                z: -1
+                opacity: 0.5
+            }
+            
+            Behavior on opacity {
+                NumberAnimation { duration: 200; easing.type: Easing.InOutQuad }
+            }
+            
+            Row {
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                anchors.leftMargin: 12
+                anchors.right: parent.right
+                anchors.rightMargin: 12
+                spacing: 8
+                
+                Text {
+                    text: {
+                        if (mainNotification.notificationType === "success") return "✓"
+                        if (mainNotification.notificationType === "error") return "✗"
+                        if (mainNotification.notificationType === "info") return "ⓘ"
+                        return "✓"
+                    }
+                    font.pixelSize: 16
+                    font.bold: true
+                    color: "#FFFFFF"
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+                
+                Text {
+                    width: parent.width - 24
+                    text: mainNotification.message
+                    font.pixelSize: 11
+                    font.bold: true
+                    color: "#FFFFFF"
+                    elide: Text.ElideRight
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+        }
+        
+        Timer {
+            id: hideTimer
+            interval: 2500
+            running: false
+            repeat: false
+            onTriggered: {
+                notificationBox.opacity = 0
+                visibilityTimer.start()
+            }
+        }
+        
+        Timer {
+            id: visibilityTimer
+            interval: 200
+            running: false
+            repeat: false
+            onTriggered: {
+                notificationBox.visible = false
+            }
+        }
+    }
+    
     // Settings window
     SettingsWindow {
         id: settingsWindow
@@ -80,7 +194,6 @@ ApplicationWindow {
             root.textSize = size
             root.textColor = color
             root.textFont = font
-            // Save to config file
             backend.save_settings(width, height, size, color, font)
         }
         
@@ -105,11 +218,26 @@ ApplicationWindow {
         backend: root.backend
     }
     
-    // Backend connection
+    // Backend connection - forward notifications to appropriate windows
     Connections {
         target: backend
+        
         function onTranslatedText(msg) {
             translated_text = msg
+        }
+        
+        function onNotificationRequested(message, notificationType) {
+            console.log("Notification signal received:", message, notificationType)
+            
+            // Show in appropriate window based on what's visible
+            if (settingsWindow.visible) {
+                settingsWindow.showNotification(message, notificationType)
+            } else if (apiKeyWindow.visible) {
+                apiKeyWindow.showNotification(message, notificationType)
+            } else {
+                // Show in main window if no other window is open
+                mainNotification.showNotification(message, notificationType)
+            }
         }
     }
 }

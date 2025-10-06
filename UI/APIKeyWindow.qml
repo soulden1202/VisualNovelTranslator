@@ -9,12 +9,24 @@ Window {
     property QtObject backend
     property int refreshCounter: 0
     
+    // Signals for notifications
+    signal apiKeyAdded(string keyName)
+    signal apiKeyDeleted(string keyName)
+    signal apiKeyActivated(string keyName)
+    
     visible: false
     width: 600
     height: 500
     title: "API Key Management"
     modality: Qt.ApplicationModal
     flags: Qt.Dialog
+    
+    // Add notification function
+    function showNotification(msg, type) {
+        if (apiNotification) {
+            apiNotification.showNotification(msg, type)
+        }
+    }
     
     Component.onCompleted: {
         loadKeys()
@@ -158,6 +170,7 @@ Window {
                                             backend.add_api_key(modelData, newKeyInput.text.trim())
                                             newKeyInput.text = ""
                                             root.refreshCounter++
+                                            // Emit signal for notification - handled by backend now
                                         }
                                     }
                                 }
@@ -252,6 +265,7 @@ Window {
                                                     if (backend) {
                                                         backend.set_active_key(keyModelName, index)
                                                         root.refreshCounter++
+                                                        // Notification handled by backend now
                                                     }
                                                 }
                                             }
@@ -284,6 +298,7 @@ Window {
                                                     if (backend) {
                                                         backend.delete_api_key(keyModelName, index)
                                                         root.refreshCounter++
+                                                        // Notification handled by backend now
                                                     }
                                                 }
                                             }
@@ -305,11 +320,10 @@ Window {
         
         Text {
             width: parent.width
-            text: "⚠️ Important: Changing active key requires restarting the application."
+            text: "💡 Tip: Add multiple keys to automatically switch when quota limits are reached"
             font.pixelSize: 11
             color: "#ff6600"
             wrapMode: Text.WordWrap
-            font.bold: true
         }
         
         Button {

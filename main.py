@@ -24,8 +24,9 @@ class Backend(QObject):
         self.translator_lock = threading.Lock()
         self.running = False
         
-    #signal to update the translation    
-    translatedText = pyqtSignal(str, arguments=['updater'])
+    # Signals
+    translatedText = pyqtSignal(str)
+    notificationRequested = pyqtSignal(str, str)
 
     def split_japanese_english(self, text):
         # Normalize newlines
@@ -63,6 +64,11 @@ class Backend(QObject):
     
     def updater(self, translated_text):
         self.translatedText.emit(translated_text)
+    
+    def show_notification(self, message, notification_type="success"):
+        """Emit notification signal"""
+        print(f"[DEBUG] Emitting notification: {message} ({notification_type})")
+        self.notificationRequested.emit(message, notification_type)
     
     def get_clipboard_text(self):
         ret = subprocess.getoutput("powershell.exe -Command Get-Clipboard")  
@@ -144,7 +150,13 @@ class Backend(QObject):
         config['text_size'] = text_size
         config['text_color'] = text_color
         config['text_font'] = text_font
-        self.config_manager.save_config(config)
+        success = self.config_manager.save_config(config)
+        
+        if success:
+            self.show_notification(f"Successfully saved settings", "success")
+        else:
+            self.show_notification(f"Failed to save settings", "error")      
+        
     
     @pyqtSlot(str)
     def save_prompt(self, prompt):
@@ -154,7 +166,12 @@ class Backend(QObject):
         self.config_manager.save_config(config)
         
         print("Prompt saved. Reinitializing translator...")
-        self.reinitialize_translator()
+        success = self.reinitialize_translator()
+        
+        if success:
+            self.show_notification(f"Successfully saved prompt", "success")
+        else:
+            self.show_notification(f"Failed to save prompt", "error")
     
     @pyqtSlot(str)
     def save_model(self, model_name):
@@ -164,7 +181,12 @@ class Backend(QObject):
         self.config_manager.save_config(config)
         
         print(f"Model changed to {model_name}. Reinitializing translator...")
-        self.reinitialize_translator()
+        success = self.reinitialize_translator()
+        
+        if success:
+            self.show_notification(f"Successfully switched to {model_name}", "success")
+        else:
+            self.show_notification(f"Failed to initialize {model_name}", "error")
     
     @pyqtSlot(result=QVariant)
     def get_available_models(self):
@@ -198,16 +220,20 @@ class Backend(QObject):
         """Add a new API key"""
         if self.api_key_manager.add_key(key_name, key_value):
             print(f"API key added for {key_name}")
+            self.show_notification(f"API key added for {key_name}", "success")
         else:
             print(f"Failed to add API key for {key_name}")
+            self.show_notification(f"Failed to add API key", "error")
     
     @pyqtSlot(str, int)
     def delete_api_key(self, key_name, index):
         """Delete an API key by index"""
         if self.api_key_manager.delete_key(key_name, index):
             print(f"API key deleted for {key_name}")
+            self.show_notification(f"API key deleted", "info")
         else:
             print(f"Failed to delete API key for {key_name}")
+            self.show_notification(f"Failed to delete API key", "error")
     
     @pyqtSlot(str, int)
     def set_active_key(self, key_name, index):
@@ -220,9 +246,16 @@ class Backend(QObject):
             current_key_name = ModelRegistry.get_api_key_name(selected_model)
             if current_key_name == key_name:
                 print("Reinitializing translator with new active key...")
-                self.reinitialize_translator()
+                success = self.reinitialize_translator()
+                if success:
+                    self.show_notification(f"Active key changed for {key_name}", "success")
+                else:
+                    self.show_notification(f"Failed to initialize with new key", "error")
+            else:
+                self.show_notification(f"Active key set for {key_name}", "success")
         else:
             print(f"Failed to set active key for {key_name}")
+            self.show_notification(f"Failed to set active key", "error")
     
     @pyqtSlot(str, result=bool)
     def has_api_key(self, key_name):
