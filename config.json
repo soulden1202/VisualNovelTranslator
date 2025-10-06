@@ -1,0 +1,10 @@
+{
+    "window_width": 1500,
+    "window_height": 200,
+    "window_opacity": 0.1,
+    "text_color": "#89b4e4",
+    "text_size": 25,
+    "text_font": "Roman",
+    "prompt": "You are a translator specializing in Japanese visual novels. Translate all text from Japanese into natural, fluent English, and also provide the romaji. Do not explain your reasoning. Only provide the romaji and English translation, with the romaji first, followed by the English. Ensure that character genders are preserved correctly, and that the translation is consistent and connected to the overall story context.",
+    "selected_model": "Gemini"
+}

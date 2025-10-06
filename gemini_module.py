@@ -12,7 +12,7 @@ class GeminiTranslator:
         
     def translate_text(self, text):
         response = self.client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-2.5-flash-lite",
             config=types.GenerateContentConfig(
                 system_instruction=self.context),
             contents=[text]
