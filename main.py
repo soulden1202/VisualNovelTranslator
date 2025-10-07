@@ -15,6 +15,17 @@ from model_registry import ModelRegistry
 from api_key_manager import APIKeyManager
 
 
+def get_resource_path(relative_path):
+    """Get absolute path to resource, works for dev and for PyInstaller"""
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    
+    return os.path.join(base_path, relative_path)
+
+
 class Backend(QObject):
     def __init__(self, config_manager, api_key_manager):
         QObject.__init__(self)
@@ -139,7 +150,7 @@ class Backend(QObject):
     
     @pyqtSlot()
     def setting_button(self):
-        engine.load('./UI/setting.qml')
+        pass
     
     @pyqtSlot(int, int, int, str, str)
     def save_settings(self, width, height, text_size, text_color, text_font):
@@ -275,7 +286,11 @@ api_key_mgr = APIKeyManager()
 
 # Load QML and set initial properties from config
 engine.quit.connect(app.quit)
-engine.load('./UI/Main.qml')
+
+# Use the resource path helper to find Main.qml
+qml_file = get_resource_path('UI/Main.qml')
+print(f"Loading QML from: {qml_file}")
+engine.load(qml_file)
 
 if engine.rootObjects():
     root = engine.rootObjects()[0]

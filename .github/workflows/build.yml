@@ -1,0 +1,39 @@
+name: Build VN Translator
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Poetry
+        run: |
+          pip install poetry
+          poetry --version
+
+      - name: Install dependencies
+        run: |
+          poetry install
+
+      - name: Build executable
+        run: |
+          poetry run pyinstaller VNTranslator.spec
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VNTranslator-Windows
+          path: dist/VNTranslator.exe
