@@ -51,11 +51,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download artifact
+      - name: Download Windows artifact
         uses: actions/download-artifact@v4
         with:
           name: VNTranslator-Windows
-          path: ./release
+          path: ./dist
+
+      - name: List files (debug)
+        run: ls -la ./dist
 
       - name: Get version from tag
         id: get_version
@@ -64,7 +67,7 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ./release/VNTranslator.exe
+          files: ./dist/VNTranslator.exe
           name: Release ${{ steps.get_version.outputs.VERSION }}
           draft: false
           prerelease: false
