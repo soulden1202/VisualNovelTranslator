@@ -3,8 +3,8 @@ Model Registry - Central place to register and manage translation models
 Add new models here to make them available in the settings
 """
 
-from gemini_module import GeminiTranslator
-from deepseek_module import DeepSeekTranslator
+from src.translators.gemini_module import GeminiTranslator
+from src.translators.deepseek_module import DeepSeekTranslator
 
 
 class ModelRegistry:
