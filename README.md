@@ -10,7 +10,7 @@ A real-time Visual Novel translator powered by LLMs (Large Language Models). Tra
 ![Screenshot 2](https://github.com/user-attachments/assets/e8bce674-d224-4365-9ad9-2989875cf55d)
 ![Screenshot 3](https://github.com/user-attachments/assets/dea5cd69-26c1-4b71-827f-d0228a93ca41)
 
-## ✨ Features
+## Features
 
 - **Real-time Translation**: Automatic clipboard monitoring with instant translation
 - **Multiple AI Models**: Support for Gemini and DeepSeek (easily extensible)
@@ -23,7 +23,7 @@ A real-time Visual Novel translator powered by LLMs (Large Language Models). Tra
 - **Smart Translation**: Context-aware prompts for better accuracy
 - **Easy Model Switching**: Change between AI models on the fly
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Option 1: Download Pre-built Executable (Recommended)
 
@@ -59,7 +59,7 @@ poetry install
 poetry run python main.py
 ```
 
-## 📖 Usage Guide
+## Usage Guide
 
 ### Setup
 
@@ -137,7 +137,7 @@ Click **"🔑 Manage API Keys"** in Settings:
 }
 ```
 
-## 🛠️ Development
+## Development
 
 ### Setting Up Development Environment
 
@@ -252,7 +252,7 @@ poetry run pyinstaller VNTranslator.spec
 # Output will be in dist/VNTranslator.exe
 ```
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
@@ -265,31 +265,30 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for gui
 - Add tests
 - Fix bugs
 
-## 📋 Roadmap
+## Roadmap
 
 - [ ] Add support for more AI models (Claude, GPT-4, etc.)
 - [ ] Translation caching to reduce API calls
 - [ ] History/logging of translations
 - [ ] Export translations to file
 - [ ] Auto-detect language
-- [ ] Batch translation mode
 - [ ] Custom dictionary/glossary support
 - [ ] macOS and Linux support
 - [ ] Better error handling and retry logic
 - [ ] Translation memory system
 - [ ] UI themes
 
-## 🐛 Known Issues
+## Known Issues
 
 - Clipboard monitoring uses PowerShell on Windows (may be slow)
 - QML files must be in correct path for PyInstaller builds
 - Some fonts may not display Japanese characters properly
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - [Textractor](https://github.com/Artikash/Textractor) - Essential text hooking tool
 - [Google Gemini](https://ai.google.dev/) - Powerful and free translation API
@@ -297,12 +296,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [PyQt6](https://www.riverbankcomputing.com/software/pyqt/) - Cross-platform UI framework
 - The Visual Novel community for inspiration
 
-## 💬 Support
+## Support
 
 - **Issues**: [GitHub Issues](https://github.com/soulden1202/VisualNovelTranslator/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/soulden1202/VisualNovelTranslator/discussions)
 
-## ⭐ Star History
+## Star
 
 If you find this project useful, please consider giving it a star!
 
