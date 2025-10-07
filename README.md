@@ -10,6 +10,22 @@ A real-time Visual Novel translator powered by LLMs (Large Language Models). Tra
 ![Screenshot 2](https://github.com/user-attachments/assets/e8bce674-d224-4365-9ad9-2989875cf55d)
 ![Screenshot 3](https://github.com/user-attachments/assets/dea5cd69-26c1-4b71-827f-d0228a93ca41)
 
+
+## Table of Contents
+
+- [Features](#features)
+- [Quick Start](#quick-start)
+  - [Download Pre-built Executable](#option-1-download-pre-built-executable-recommended)
+  - [Run from Source](#option-2-run-from-source)
+- [Usage Guide](#usage-guide)
+  - [Setup](#setup)
+  - [Running](#running)
+  - [Tips](#tips)
+- [Development](#development)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgments](#acknowledgments)
+
 ## Features
 
 - **Real-time Translation**: Automatic clipboard monitoring with instant translation
