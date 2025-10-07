@@ -1,6 +1,6 @@
 # VN Translator
 
-[![Build Status](https://github.com/yourusername/vn-translator/workflows/Build%20and%20Release%20VN%20Translator/badge.svg)](https://github.com/yourusername/vn-translator/actions)
+[![Build Status](https://github.com/soulden1202/VisualNovelTranslator/workflows/Build%20and%20Release%20VN%20Translator/badge.svg)](https://github.com/soulden1202/VisualNovelTranslator/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python Version](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 
@@ -10,7 +10,7 @@ A real-time Visual Novel translator powered by LLMs (Large Language Models). Tra
 ![Screenshot 2](https://github.com/user-attachments/assets/e8bce674-d224-4365-9ad9-2989875cf55d)
 ![Screenshot 3](https://github.com/user-attachments/assets/dea5cd69-26c1-4b71-827f-d0228a93ca41)
 
-## Features
+## ✨ Features
 
 - **Real-time Translation**: Automatic clipboard monitoring with instant translation
 - **Multiple AI Models**: Support for Gemini and DeepSeek (easily extensible)
@@ -23,11 +23,11 @@ A real-time Visual Novel translator powered by LLMs (Large Language Models). Tra
 - **Smart Translation**: Context-aware prompts for better accuracy
 - **Easy Model Switching**: Change between AI models on the fly
 
-## Quick Start
+## 🚀 Quick Start
 
 ### Option 1: Download Pre-built Executable (Recommended)
 
-1. Download the latest `VNTranslator.exe` from [Releases](https://github.com/yourusername/vn-translator/releases)
+1. Download the latest `VNTranslator.exe` from [Releases](https://github.com/soulden1202/VisualNovelTranslator/releases)
 2. Run the executable
 3. Configure your API keys in Settings → Manage API Keys
 4. Start your visual novel and Textractor
@@ -46,8 +46,8 @@ A real-time Visual Novel translator powered by LLMs (Large Language Models). Tra
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/vn-translator.git
-cd vn-translator
+git clone https://github.com/soulden1202/VisualNovelTranslator.git
+cd VisualNovelTranslator
 
 # Install Poetry (if not already installed)
 pip install poetry
@@ -59,7 +59,7 @@ poetry install
 poetry run python main.py
 ```
 
-## Usage Guide
+## 📖 Usage Guide
 
 ### Setup
 
@@ -75,7 +75,7 @@ poetry run python main.py
 
 3. **Configure VN Translator**:
    - Open Settings (A button in top-right)
-   - Click " Manage API Keys"
+   - Click "🔑 Manage API Keys"
    - Add your API key(s)
    - Select preferred model
    - Customize appearance and translation prompt if desired
@@ -95,7 +95,7 @@ poetry run python main.py
 - **Window Position**: Drag the overlay window to position it anywhere on screen
 - **Font Selection**: Choose fonts that support Japanese characters for best display
 
-## Configuration
+## 🔧 Configuration
 
 ### Settings Window
 
@@ -110,7 +110,7 @@ Access via the **A** button in the top-right corner:
 
 ### API Key Management
 
-Click **"Manage API Keys"** in Settings:
+Click **"🔑 Manage API Keys"** in Settings:
 
 - Add multiple API keys per model
 - Set active key with "Set Active" button
@@ -160,7 +160,7 @@ python main.py
 ### Project Structure
 
 ```
-vn-translator/
+VisualNovelTranslator/
 ├── UI/                          # QML interface files
 │   ├── main.qml                 # Main overlay window
 │   ├── SettingsWindow.qml       # Settings dialog
@@ -252,7 +252,7 @@ poetry run pyinstaller VNTranslator.spec
 # Output will be in dist/VNTranslator.exe
 ```
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
@@ -265,7 +265,7 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for gui
 - Add tests
 - Fix bugs
 
-## Roadmap
+## 📋 Roadmap
 
 - [ ] Add support for more AI models (Claude, GPT-4, etc.)
 - [ ] Translation caching to reduce API calls
@@ -297,15 +297,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [PyQt6](https://www.riverbankcomputing.com/software/pyqt/) - Cross-platform UI framework
 - The Visual Novel community for inspiration
 
-## Support
+## 💬 Support
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/vn-translator/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/vn-translator/discussions)
+- **Issues**: [GitHub Issues](https://github.com/soulden1202/VisualNovelTranslator/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/soulden1202/VisualNovelTranslator/discussions)
 
-## Star History
+## ⭐ Star History
 
 If you find this project useful, please consider giving it a star!
 
 ---
 
-**Made with for Visual Novel fans who can't wait for official translations**
+**Made with ❤️ for Visual Novel fans who can't wait for official translations**
