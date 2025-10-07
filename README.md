@@ -135,7 +135,7 @@ Click **"🔑 Manage API Keys"** in Settings:
 
 ### Configuration Files
 
-- `config.json` - Application settings (window size, colors, prompt, etc.)
+- `config.json` - Application settings (window size, colors, prompt, etc. Auto-generated, gitignored)
 - `api_keys.json` - Encrypted API keys storage (auto-generated, gitignored)
 
 **Example `config.json`:**
