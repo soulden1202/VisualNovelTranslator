@@ -90,7 +90,8 @@ ENV/
 env.bak/
 venv.bak/
 api_keys.json
-
+poetry.lock
+config.json
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -100,6 +101,7 @@ api_keys.json
 
 # mkdocs documentation
 /site
+
 
 # mypy
 .mypy_cache/
