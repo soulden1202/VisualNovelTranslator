@@ -153,6 +153,22 @@ Click **"🔑 Manage API Keys"** in Settings:
 }
 ```
 
+**Example `api_keys.json`:**
+
+```json
+{
+{
+    "GEMINI_API_KEY": {
+        "keys": [
+          "key1",
+          "key2"
+        ],
+        "active_index": 1
+    }
+}
+}
+```
+
 ## Development
 
 ### Setting Up Development Environment
