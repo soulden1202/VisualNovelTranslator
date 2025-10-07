@@ -1,6 +1,6 @@
 # VN Translator
 
-[![Build Status](https://github.com/soulden1202/VisualNovelTranslator/workflows/Build%20and%20Release%20VN%20Translator/badge.svg)](https://github.com/soulden1202/VisualNovelTranslator/actions)
+[![Build Status](https://img.shields.io/badge/build_status-status)](https://github.com/soulden1202/VisualNovelTranslator/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python Version](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 
