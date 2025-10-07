@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "vn-translator"
+version = "0.1.0"
+description = "A Visual Novel translator using LLMs"
+authors = ["soulden1202 <soulden12@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.15"
+PyQt6 = "^6.6.0"
+pyperclip = "^1.9.0"
+google-genai = "^0.2.0"
+openai = "^1.12.0"
+
+[tool.poetry.group.dev.dependencies]
+pyinstaller = "^6.3.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
