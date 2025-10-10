@@ -22,306 +22,634 @@ Window {
     signal openAPIKeys()
     
     visible: false
-    width: 400
-    height: 750
+    width: 500
+    height: 1000
     title: "Settings"
     modality: Qt.ApplicationModal
     flags: Qt.Dialog
+    color: "#1A1A1E"
     
-    // Add notification function
     function showNotification(msg, type) {
         settingsNotification.showNotification(msg, type)
     }
     
-    Column {
-        id: frame
+    Rectangle {
         anchors.fill: parent
-        anchors.margins: 10
-        spacing: 5
+        color: "#1A1A1E"
+        border.color: "#2D2D32"
+        border.width: 1
         
-        // Height input
-        SettingRow {
-            id: heightRow
-            width: frame.width
-            labelText: "Height"
-            textValue: root.windowHeight
-        }
-        
-        // Width input
-        SettingRow {
-            id: widthRow
-            width: frame.width
-            labelText: "Width"
-            textValue: root.windowWidth
-        }
-        
-        // Color input
-        Row {
-            id: colorInput
-            width: frame.width
-            spacing: 10
+        Column {
+            id: frame
+            anchors.fill: parent
+            anchors.margins: 24
+            spacing: 20
             
-            Rectangle {
-                width: 60
-                height: 30
-                Text {
-                    clip: false
-                    text: "Color"
-                    font.pixelSize: 20
-                    color:  root.fontColor
-                }
-            }
-            
-            ColorPreview {
-                id: colorPreview
-                currentColor: root.fontColor
-                onColorClicked: {
-                    colorDialog.selectedColor = root.fontColor
-                    textColorDialog.show()
-                    colorDialog.open()
-                }
-            }
-        }
-        
-        // Size input
-        SettingRow {
-            id: sizeRow
-            width: frame.width
-            labelText: "Size"
-            textValue: root.fontSize
-            maxValue: 200
-        }
-        
-        // Font input
-        Row {
-            id: fontInput
-            width: frame.width
-            spacing: 10
-            
-            Rectangle {
-                width: 60
-                height: 30
-                Text {
-                    clip: false
-                    text: "Font"
-                    font.pixelSize: 20
-                    color: "black"
-                }
-            }
-            
-            ComboBox {
-                id: fontComboBox
-                width: 170
-                height: 30
-                model: Qt.fontFamilies()
-                currentIndex: find(root.fontFamily, Qt.MatchExactly | Qt.MatchCaseInsensitive)
-            }
-        }
-        
-        // Font preview
-        Rectangle {
-            width: frame.width - 10
-            height: 60
-            color: "#f0f0f0"
-            border.color: "#cccccc"
-            border.width: 1
-            radius: 3
-            
+            // Header
             Text {
-                anchors.centerIn: parent
-                text: "Preview Text 予覧 123"
-                font.family: fontComboBox.currentText
-                font.pixelSize: 16
-                color: root.fontColor
+                text: "Settings"
+                font.pixelSize: 28
+                font.weight: Font.Bold
+                color: "#E8E8E8"
             }
-        }
-        
-        // Prompt editor section
-        Rectangle {
-            width: frame.width
-            height: 2
-            color: "#cccccc"
-        }
-        
-        Text {
-            text: "Translation Model"
-            font.pixelSize: 18
-            font.bold: true
-            color: "black"
-        }
-
-        Text {
-            text: "Current model: " + root.currentModel
-            font.pixelSize: 13
-            color: "#666666"
-        }
-        
-        Button {
-            height: 35
-            width: 200
-            text: "🔑 Manage API Keys"
-            font.pixelSize: 13
-            background: Rectangle {
-                color: parent.down ? "#ff8844" : (parent.hovered ? "#ffaa66" : "#ffcc88")
-                radius: 5
-                border.width: 1
-                border.color: "#ff6622"
-            }
-            onClicked: {
-                root.openAPIKeys()
-            }
-        }
-        
-        Row {
-            width: frame.width
-            spacing: 10
             
             Rectangle {
-                width: 60
-                height: 30
-                Text {
-                    clip: false
-                    text: "Model"
-                    font.pixelSize: 16
-                    color: "black"
-                }
-            }
-            
-            ComboBox {
-                id: modelComboBox
-                width: 150
-                height: 30
-                model: root.availableModels
-                currentIndex: {
-                    var idx = find(root.currentModel, Qt.MatchExactly | Qt.MatchCaseInsensitive)
-                    return idx !== -1 ? idx : 0 
-                }
-            }
-            
-            Button {
-                height: 30
-                width: 100
-                text: qsTr("Change Model")
-                background: Rectangle {
-                    color: parent.down ? "#8888cc" : (parent.hovered ? "#aaaadd" : "#ccccee")
-                    radius: 3
-                }
-                onClicked: {
-                    root.modelChanged(modelComboBox.currentText)
-                }
-            }
-        }
-        
-        Rectangle {
-            width: frame.width
-            height: 2
-            color: "#cccccc"
-        }
-        
-        Text {
-            text: "LLM Prompt"
-            font.pixelSize: 18
-            font.bold: true
-            color: "black"
-        }
-        
-        ScrollView {
-            width: frame.width
-            height: 150
-            clip: true
-            
-            TextArea {
-                id: promptTextArea
                 width: parent.width
-                wrapMode: TextArea.Wrap
-                text: root.prompt
-                placeholderText: "Enter your LLM prompt here..."
-                font.pixelSize: 12
-                background: Rectangle {
-                    color: "white"
-                    border.color: "#cccccc"
+                height: 1
+                color: "#2D2D32"
+            }
+            
+            // Window Settings Section
+            Column {
+                width: parent.width
+                spacing: 12
+                
+                Text {
+                    text: "Window"
+                    font.pixelSize: 16
+                    font.weight: Font.Medium
+                    color: "#B8B8B8"
+                }
+                
+                Row {
+                    width: parent.width
+                    spacing: 12
+                    
+                    Column {
+                        width: (parent.width - 12) / 2
+                        spacing: 6
+                        
+                        Text {
+                            text: "Width"
+                            font.pixelSize: 12
+                            color: "#808080"
+                        }
+                        
+                        TextField {
+                            id: widthField
+                            width: parent.width
+                            height: 36
+                            text: root.windowWidth
+                            color: "#E8E8E8"
+                            font.pixelSize: 14
+                            validator: IntValidator { bottom: 1; top: 3000 }
+                            
+                            background: Rectangle {
+                                color: "#252529"
+                                border.color: parent.activeFocus ? "#4A9EFF" : "#2D2D32"
+                                border.width: 1
+                                radius: 6
+                            }
+                        }
+                    }
+                    
+                    Column {
+                        width: (parent.width - 12) / 2
+                        spacing: 6
+                        
+                        Text {
+                            text: "Height"
+                            font.pixelSize: 12
+                            color: "#808080"
+                        }
+                        
+                        TextField {
+                            id: heightField
+                            width: parent.width
+                            height: 36
+                            text: root.windowHeight
+                            color: "#E8E8E8"
+                            font.pixelSize: 14
+                            validator: IntValidator { bottom: 1; top: 3000 }
+                            
+                            background: Rectangle {
+                                color: "#252529"
+                                border.color: parent.activeFocus ? "#4A9EFF" : "#2D2D32"
+                                border.width: 1
+                                radius: 6
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Text Settings Section
+            Column {
+                width: parent.width
+                spacing: 12
+                
+                Text {
+                    text: "Text Appearance"
+                    font.pixelSize: 16
+                    font.weight: Font.Medium
+                    color: "#B8B8B8"
+                }
+                
+                Row {
+                    width: parent.width
+                    spacing: 12
+                    
+                    Column {
+                        width: (parent.width - 12) / 2
+                        spacing: 6
+                        
+                        Text {
+                            text: "Size"
+                            font.pixelSize: 12
+                            color: "#808080"
+                        }
+                        
+                        TextField {
+                            id: sizeField
+                            width: parent.width
+                            height: 36
+                            text: root.fontSize
+                            color: "#E8E8E8"
+                            font.pixelSize: 14
+                            validator: IntValidator { bottom: 1; top: 200 }
+                            
+                            background: Rectangle {
+                                color: "#252529"
+                                border.color: parent.activeFocus ? "#4A9EFF" : "#2D2D32"
+                                border.width: 1
+                                radius: 6
+                            }
+                        }
+                    }
+                    
+                    Column {
+                        width: (parent.width - 12) / 2
+                        spacing: 6
+                        
+                        Text {
+                            text: "Color"
+                            font.pixelSize: 12
+                            color: "#808080"
+                        }
+                        
+                        Rectangle {
+                            width: parent.width
+                            height: 36
+                            color: "#252529"
+                            border.color: colorMouseArea.containsMouse ? "#4A9EFF" : "#2D2D32"
+                            border.width: 1
+                            radius: 6
+                            
+                            Rectangle {
+                                anchors.centerIn: parent
+                                width: parent.width - 12
+                                height: parent.height - 12
+                                color: root.fontColor
+                                radius: 4
+                                border.color: "#000000"
+                                border.width: 1
+                            }
+                            
+                            MouseArea {
+                                id: colorMouseArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    colorDialog.selectedColor = root.fontColor
+                                    textColorDialog.show()
+                                    colorDialog.open()
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                Column {
+                    width: parent.width
+                    spacing: 6
+                    
+                    Text {
+                        text: "Font Family"
+                        font.pixelSize: 12
+                        color: "#808080"
+                    }
+                    
+                    ComboBox {
+                        id: fontComboBox
+                        width: parent.width
+                        height: 36
+                        model: Qt.fontFamilies()
+                        currentIndex: find(root.fontFamily, Qt.MatchExactly | Qt.MatchCaseInsensitive)
+                        
+                        contentItem: Text {
+                            leftPadding: 12
+                            text: fontComboBox.displayText
+                            font.pixelSize: 14
+                            color: "#E8E8E8"
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        
+                        background: Rectangle {
+                            color: "#252529"
+                            border.color: fontComboBox.down ? "#4A9EFF" : "#2D2D32"
+                            border.width: 1
+                            radius: 6
+                        }
+                    }
+                }
+                
+                // Preview
+                Rectangle {
+                    width: parent.width
+                    height: 60
+                    color: "#0D0D10"
+                    border.color: "#2D2D32"
                     border.width: 1
-                    radius: 3
+                    radius: 6
+                    
+                    Text {
+                        anchors.centerIn: parent
+                        text: "Preview Text 予覧 123"
+                        font.family: fontComboBox.currentText
+                        font.pixelSize: 16
+                        color: root.fontColor
+                    }
                 }
             }
-        }
-        
-        Row {
-            width: frame.width
-            spacing: 10
             
+            Rectangle {
+                width: parent.width
+                height: 1
+                color: "#2D2D32"
+            }
+            
+            // Translation Model Section
+            Column {
+                width: parent.width
+                spacing: 12
+                
+                Text {
+                    text: "Translation Model"
+                    font.pixelSize: 16
+                    font.weight: Font.Medium
+                    color: "#B8B8B8"
+                }
+                
+                Text {
+                    text: "Current: " + root.currentModel
+                    font.pixelSize: 12
+                    color: "#808080"
+                }
+                
+                Button {
+                    height: 40
+                    width: parent.width
+                    text: "🔑  Manage API Keys"
+                    font.pixelSize: 14
+                    font.weight: Font.Medium
+                    
+                    contentItem: Text {
+                        text: parent.text
+                        font: parent.font
+                        color: "#E8E8E8"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    
+                    background: Rectangle {
+                        color: parent.down ? "#4A7FC7" : (parent.hovered ? "#5A8FD7" : "#4A9EFF")
+                        radius: 6
+                        border.color: parent.hovered ? "#6A9FE7" : "transparent"
+                        border.width: 1
+                        
+                        Behavior on color {
+                            ColorAnimation { duration: 150 }
+                        }
+                    }
+                    
+                    onClicked: root.openAPIKeys()
+                }
+                
+                Row {
+                    width: parent.width
+                    spacing: 12
+                    
+                    ComboBox {
+                        id: modelComboBox
+                        width: parent.width - 120
+                        height: 36
+                        model: root.availableModels
+                        currentIndex: {
+                            var idx = find(root.currentModel, Qt.MatchExactly | Qt.MatchCaseInsensitive)
+                            return idx !== -1 ? idx : 0
+                        }
+                        
+                        contentItem: Text {
+                            leftPadding: 12
+                            text: modelComboBox.displayText
+                            font.pixelSize: 14
+                            color: "#E8E8E8"
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        
+                        background: Rectangle {
+                            color: "#252529"
+                            border.color: modelComboBox.down ? "#4A9EFF" : "#2D2D32"
+                            border.width: 1
+                            radius: 6
+                        }
+                    }
+                    
+                    Button {
+                        height: 36
+                        width: 108
+                        text: "Switch"
+                        font.pixelSize: 13
+                        
+                        contentItem: Text {
+                            text: parent.text
+                            font: parent.font
+                            color: "#E8E8E8"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        
+                        background: Rectangle {
+                            color: parent.down ? "#2D5A2D" : (parent.hovered ? "#3D6A3D" : "#4D7A4D")
+                            radius: 6
+                            
+                            Behavior on color {
+                                ColorAnimation { duration: 150 }
+                            }
+                        }
+                        
+                        onClicked: root.modelChanged(modelComboBox.currentText)
+                    }
+                }
+            }
+            
+            Rectangle {
+                width: parent.width
+                height: 1
+                color: "#2D2D32"
+            }
+            
+            // LLM Prompt Section
+            Column {
+                width: parent.width
+                spacing: 12
+                
+                Text {
+                    text: "Translation Prompt"
+                    font.pixelSize: 16
+                    font.weight: Font.Medium
+                    color: "#B8B8B8"
+                }
+                
+                ScrollView {
+                    width: parent.width
+                    height: 140
+                    clip: true
+                    
+                    TextArea {
+                        id: promptTextArea
+                        width: parent.width
+                        wrapMode: TextArea.Wrap
+                        text: root.prompt
+                        placeholderText: "Enter translation instructions..."
+                        font.pixelSize: 12
+                        color: "#E8E8E8"
+                        
+                        background: Rectangle {
+                            color: "#252529"
+                            border.color: "#2D2D32"
+                            border.width: 1
+                            radius: 6
+                        }
+                    }
+                }
+                
+                Button {
+                    height: 36
+                    width: 120
+                    text: "Save Prompt"
+                    font.pixelSize: 13
+                    
+                    contentItem: Text {
+                        text: parent.text
+                        font: parent.font
+                        color: "#E8E8E8"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    
+                    background: Rectangle {
+                        color: parent.down ? "#2D5A2D" : (parent.hovered ? "#3D6A3D" : "#4D7A4D")
+                        radius: 6
+                        
+                        Behavior on color {
+                            ColorAnimation { duration: 150 }
+                        }
+                    }
+                    
+                    onClicked: root.promptSaved(promptTextArea.text)
+                }
+            }
+            
+            Item { height: 1 }
+            
+            // Save Button
             Button {
-                height: 25
-                width: 80
-                text: qsTr("Save Prompt")
+                height: 44
+                width: parent.width
+                text: "Save Settings"
+                font.pixelSize: 15
+                font.weight: Font.Medium
+                
+                contentItem: Text {
+                    text: parent.text
+                    font: parent.font
+                    color: "#E8E8E8"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+                
                 background: Rectangle {
-                    color: parent.down ? "#88cc88" : (parent.hovered ? "#aaddaa" : "#cceecc")
-                    radius: 3
+                    color: parent.down ? "#4A7FC7" : (parent.hovered ? "#5A8FD7" : "#4A9EFF")
+                    radius: 6
+                    
+                    Behavior on color {
+                        ColorAnimation { duration: 150 }
+                    }
                 }
+                
                 onClicked: {
-                    root.promptSaved(promptTextArea.text)
+                    root.settingsSaved(
+                        parseInt(heightField.text),
+                        parseInt(widthField.text),
+                        parseInt(sizeField.text),
+                        root.fontColor,
+                        fontComboBox.currentText
+                    )
+                    root.close()
                 }
-            }
-            
-        }
-        
-        Rectangle {
-            width: frame.width
-            height: 2
-            color: "#cccccc"
-        }
-        
-        // Save button
-        Button {
-            height: 25
-            width: 140
-            anchors.right: parent.right
-            anchors.rightMargin: 5
-            text: qsTr("Save Size/Font settings")
-            background: Rectangle {
-                color: parent.down ? "#bbbbbb" : (parent.hovered ? "#d6d6d6" : "#f6f6f6")
-                radius: 3
-            }
-            onClicked: {
-                root.settingsSaved(
-                    heightRow.getValue(),
-                    widthRow.getValue(),
-                    sizeRow.getValue(),
-                    root.fontColor,
-                    fontComboBox.currentText
-                )
-                root.close()
             }
         }
     }
     
     // Color dialog
-    Window {
+     Window {
         visible: false
-        width: 375
-        height: 275
+        width: 400
+        height: 300
         id: textColorDialog
         title: "Color Picker"
         modality: Qt.ApplicationModal
+        color: "#1A1A1E"
+        
+        Rectangle {
+            anchors.fill: parent
+            color: "#1A1A1E"
+            border.color: "#2D2D32"
+            border.width: 1
+            
+            Column {
+                anchors.fill: parent
+                anchors.margins: 24
+                spacing: 16
+                
+                Text {
+                    text: "Choose Color"
+                    font.pixelSize: 20
+                    font.weight: Font.Bold
+                    color: "#E8E8E8"
+                }
+                
+                Rectangle {
+                    width: parent.width
+                    height: 1
+                    color: "#2D2D32"
+                }
+                
+                // Color preview
+                Rectangle {
+                    width: parent.width
+                    height: 80
+                    color: colorDialog.selectedColor
+                    border.color: "#2D2D32"
+                    border.width: 1
+                    radius: 6
+                }
+                
+                Text {
+                    text: "Color: " + colorDialog.selectedColor
+                    font.pixelSize: 13
+                    font.family: "Consolas"
+                    color: "#B8B8B8"
+                }
+                
+                Item { height: 10 }
+                
+                Row {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 12
+                    
+                    Button {
+                        width: 100
+                        height: 36
+                        text: "Cancel"
+                        font.pixelSize: 13
+                        
+                        contentItem: Text {
+                            text: parent.text
+                            font: parent.font
+                            color: "#E8E8E8"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        
+                        background: Rectangle {
+                            color: parent.down ? "#2D2D32" : (parent.hovered ? "#3D3D42" : "#252529")
+                            border.color: "#2D2D32"
+                            border.width: 1
+                            radius: 6
+                            
+                            Behavior on color {
+                                ColorAnimation { duration: 150 }
+                            }
+                        }
+                        
+                        onClicked: textColorDialog.close()
+                    }
+                    
+                    Button {
+                        width: 100
+                        height: 36
+                        text: "Pick Color"
+                        font.pixelSize: 13
+                        font.weight: Font.Medium
+                        
+                        contentItem: Text {
+                            text: parent.text
+                            font: parent.font
+                            color: "#E8E8E8"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        
+                        background: Rectangle {
+                            color: parent.down ? "#4A7FC7" : (parent.hovered ? "#5A8FD7" : "#4A9EFF")
+                            radius: 6
+                            
+                            Behavior on color {
+                                ColorAnimation { duration: 150 }
+                            }
+                        }
+                        
+                        onClicked: colorDialog.open()
+                    }
+                    
+                    Button {
+                        width: 100
+                        height: 36
+                        text: "Apply"
+                        font.pixelSize: 13
+                        font.weight: Font.Medium
+                        
+                        contentItem: Text {
+                            text: parent.text
+                            font: parent.font
+                            color: "#E8E8E8"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        
+                        background: Rectangle {
+                            color: parent.down ? "#2D5A2D" : (parent.hovered ? "#3D6A3D" : "#4D7A4D")
+                            radius: 6
+                            
+                            Behavior on color {
+                                ColorAnimation { duration: 150 }
+                            }
+                        }
+                        
+                        onClicked: {
+                            root.fontColor = colorDialog.selectedColor
+                            textColorDialog.close()
+                        }
+                    }
+                }
+            }
+        }
         
         ColorDialog {
             id: colorDialog
-            title: "Please choose a color"
+            title: "Choose a color"
+            parentWindow: textColorDialog
             
             onAccepted: {
                 root.fontColor = colorDialog.selectedColor
-                colorDialog.close()
-                textColorDialog.close()
-            }
-            
-            onRejected: {
-                colorDialog.close()
-                textColorDialog.close()
             }
         }
     }
     
-    // Notification component - MUST BE LAST to render on top
+    // Notification component
     Item {
         id: settingsNotification
         anchors.fill: parent
@@ -333,22 +661,10 @@ Window {
         property string notificationType: "success"
         
         function showNotification(msg, type) {
-            console.log("=== NOTIFICATION FUNCTION CALLED ===")
-            console.log("Message:", msg)
-            console.log("Type:", type)
-            console.log("notificationBox exists:", notificationBox)
-            console.log("notificationBox visible before:", notificationBox.visible)
-            console.log("notificationBox opacity before:", notificationBox.opacity)
-            
             message = msg
             notificationType = type || "success"
             notificationBox.visible = true
             notificationBox.opacity = 1
-            
-            console.log("notificationBox visible after:", notificationBox.visible)
-            console.log("notificationBox opacity after:", notificationBox.opacity)
-            console.log("notificationBox color:", notificationBox.color)
-            
             hideTimer.restart()
         }
         
@@ -360,42 +676,28 @@ Window {
                 bottomMargin: 20
             }
             width: Math.min(parent.width - 40, 350)
-            height: 60
+            height: 56
             radius: 8
             visible: false
             opacity: 0
             enabled: true
             
             color: {
-                if (settingsNotification.notificationType === "success") return "#4CAF50"
-                if (settingsNotification.notificationType === "error") return "#F44336"
-                if (settingsNotification.notificationType === "info") return "#2196F3"
-                return "#4CAF50"
+                if (settingsNotification.notificationType === "success") return Qt.rgba(0.2, 0.8, 0.4, 0.95)
+                if (settingsNotification.notificationType === "error") return Qt.rgba(0.9, 0.3, 0.3, 0.95)
+                if (settingsNotification.notificationType === "info") return Qt.rgba(0.3, 0.6, 0.9, 0.95)
+                return Qt.rgba(0.2, 0.8, 0.4, 0.95)
             }
             
-            Component.onCompleted: {
-                console.log("notificationBox created, parent:", parent)
-                console.log("notificationBox dimensions:", width, "x", height)
-            }
-            
-            // Drop shadow
-            Rectangle {
-                anchors.fill: parent
-                anchors.margins: -2
-                radius: parent.radius
-                color: "transparent"
-                border.color: "#00000040"
-                border.width: 2
-                z: -1
-            }
+            border.color: Qt.rgba(1, 1, 1, 0.2)
+            border.width: 1
             
             Behavior on opacity {
                 NumberAnimation { duration: 300; easing.type: Easing.InOutQuad }
             }
             
             Row {
-                anchors.fill: parent
-                anchors.margins: 16
+                anchors.centerIn: parent
                 spacing: 12
                 
                 Text {
@@ -405,20 +707,17 @@ Window {
                         if (settingsNotification.notificationType === "info") return "ⓘ"
                         return "✓"
                     }
-                    font.pixelSize: 24
+                    font.pixelSize: 22
                     font.bold: true
                     color: "#FFFFFF"
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 
                 Text {
-                    width: parent.width - 40
                     text: settingsNotification.message
                     font.pixelSize: 14
+                    font.weight: Font.Medium
                     color: "#FFFFFF"
-                    wrapMode: Text.WordWrap
-                    elide: Text.ElideRight
-                    maximumLineCount: 2
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }
@@ -430,7 +729,6 @@ Window {
             running: false
             repeat: false
             onTriggered: {
-                console.log("Hide timer triggered")
                 notificationBox.opacity = 0
                 visibilityTimer.start()
             }
@@ -442,7 +740,6 @@ Window {
             running: false
             repeat: false
             onTriggered: {
-                console.log("Visibility timer triggered, hiding notification")
                 notificationBox.visible = false
             }
         }
