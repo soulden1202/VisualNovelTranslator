@@ -57,8 +57,13 @@ jobs:
           name: VNTranslator-Windows
           path: ./dist
 
-      - name: List files (debug)
-        run: ls -la ./dist
+      - name: List downloaded files
+        run: |
+          echo "Contents of dist folder:"
+          ls -la ./dist
+          echo "Current directory:"
+          pwd
+          ls -la
 
       - name: Get version from tag
         id: get_version
@@ -71,5 +76,6 @@ jobs:
           name: Release ${{ steps.get_version.outputs.VERSION }}
           draft: false
           prerelease: false
+          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
