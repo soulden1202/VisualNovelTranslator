@@ -7,8 +7,8 @@ ApplicationWindow {
     // Properties
     property int w: 1000
     property int h: 200
-    property double o: 0.1
-    property string textColor: "#FFFFFF"
+    property double o: 0.95
+    property string textColor: "#E8E8E8"
     property int textSize: 20
     property string textFont: "Arial"
     property string llmPrompt: ""
@@ -21,9 +21,18 @@ ApplicationWindow {
     visible: true
     width: w
     height: h
-    title: "VNtranslator"
+    title: "VN Translator"
     flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
-    color: Qt.rgba(0, 0, 0, o)
+    color: Qt.rgba(0.1, 0.1, 0.12, o)
+    
+    // Subtle border
+    Rectangle {
+        anchors.fill: parent
+        color: "transparent"
+        border.color: Qt.rgba(0.3, 0.3, 0.35, 0.3)
+        border.width: 1
+        radius: 8
+    }
     
     // Drag handler for moving window
     DragHandler {
@@ -36,32 +45,91 @@ ApplicationWindow {
     }
     
     // Control buttons
-    ControlButtons {
+    Row {
         anchors {
             top: parent.top
             right: parent.right
+            margins: 8
         }
-        onCloseClicked: backend.close_button()
-        onSettingsClicked: settingsWindow.show()
+        spacing: 4
+        z: 100
+        
+        // Settings button
+        Rectangle {
+            width: 32
+            height: 32
+            radius: 6
+            color: settingsMouseArea.containsMouse ? Qt.rgba(0.3, 0.3, 0.35, 0.8) : Qt.rgba(0.2, 0.2, 0.25, 0.6)
+            border.color: Qt.rgba(0.4, 0.4, 0.45, 0.4)
+            border.width: 1
+            
+            Behavior on color {
+                ColorAnimation { duration: 150 }
+            }
+            
+            Text {
+                anchors.centerIn: parent
+                text: "⚙"
+                font.pixelSize: 16
+                color: "#E8E8E8"
+            }
+            
+            MouseArea {
+                id: settingsMouseArea
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: settingsWindow.show()
+                cursorShape: Qt.PointingHandCursor
+            }
+        }
+        
+        // Close button
+        Rectangle {
+            width: 32
+            height: 32
+            radius: 6
+            color: closeMouseArea.containsMouse ? Qt.rgba(0.8, 0.2, 0.2, 0.8) : Qt.rgba(0.2, 0.2, 0.25, 0.6)
+            border.color: Qt.rgba(0.4, 0.4, 0.45, 0.4)
+            border.width: 1
+            
+            Behavior on color {
+                ColorAnimation { duration: 150 }
+            }
+            
+            Text {
+                anchors.centerIn: parent
+                text: "×"
+                font.pixelSize: 20
+                color: "#E8E8E8"
+            }
+            
+            MouseArea {
+                id: closeMouseArea
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: backend.close_button()
+                cursorShape: Qt.PointingHandCursor
+            }
+        }
     }
     
     // Display text
-    TranslatedTextDisplay {
+    Text {
         anchors {
-            top: parent.top
-            left: parent.left
-            right: parent.right
-            leftMargin: 12
-            rightMargin: 12
-            bottomMargin: 12
+            fill: parent
+            margins: 16
+            topMargin: 48
         }
-        displayText: translated_text
-        fontSize: textSize
-        fontColor: textColor
-        fontFamily: textFont
+        text: translated_text
+        font.pixelSize: textSize
+        font.family: textFont
+        color: textColor
+        wrapMode: Text.Wrap
+        elide: Text.ElideNone
+        clip: false
     }
     
-    // Compact notification for main window
+    // Compact notification
     Item {
         id: mainNotification
         anchors.fill: parent
@@ -71,7 +139,6 @@ ApplicationWindow {
         property string notificationType: "success"
         
         function showNotification(msg, type) {
-            console.log("Main window notification:", msg, type)
             message = msg
             notificationType = type || "success"
             
@@ -90,43 +157,31 @@ ApplicationWindow {
             anchors {
                 horizontalCenter: parent.horizontalCenter
                 top: parent.top
-                topMargin: 10
+                topMargin: 12
             }
             width: Math.min(parent.width - 120, 400)
-            height: 35
-            radius: 17
+            height: 40
+            radius: 8
             visible: false
             opacity: 0
             
             color: {
-                if (mainNotification.notificationType === "success") return "#4CAF50"
-                if (mainNotification.notificationType === "error") return "#F44336"
-                if (mainNotification.notificationType === "info") return "#2196F3"
-                return "#4CAF50"
+                if (mainNotification.notificationType === "success") return Qt.rgba(0.2, 0.8, 0.4, 0.95)
+                if (mainNotification.notificationType === "error") return Qt.rgba(0.9, 0.3, 0.3, 0.95)
+                if (mainNotification.notificationType === "info") return Qt.rgba(0.3, 0.6, 0.9, 0.95)
+                return Qt.rgba(0.2, 0.8, 0.4, 0.95)
             }
             
-            Rectangle {
-                anchors.fill: parent
-                anchors.margins: -2
-                radius: parent.radius
-                color: "transparent"
-                border.color: "#00000050"
-                border.width: 2
-                z: -1
-                opacity: 0.5
-            }
+            border.color: Qt.rgba(1, 1, 1, 0.2)
+            border.width: 1
             
             Behavior on opacity {
                 NumberAnimation { duration: 200; easing.type: Easing.InOutQuad }
             }
             
             Row {
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
-                anchors.leftMargin: 12
-                anchors.right: parent.right
-                anchors.rightMargin: 12
-                spacing: 8
+                anchors.centerIn: parent
+                spacing: 10
                 
                 Text {
                     text: {
@@ -135,19 +190,17 @@ ApplicationWindow {
                         if (mainNotification.notificationType === "info") return "ⓘ"
                         return "✓"
                     }
-                    font.pixelSize: 16
+                    font.pixelSize: 18
                     font.bold: true
                     color: "#FFFFFF"
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 
                 Text {
-                    width: parent.width - 24
                     text: mainNotification.message
-                    font.pixelSize: 11
-                    font.bold: true
+                    font.pixelSize: 12
+                    font.weight: Font.Medium
                     color: "#FFFFFF"
-                    elide: Text.ElideRight
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }
@@ -218,7 +271,7 @@ ApplicationWindow {
         backend: root.backend
     }
     
-    // Backend connection - forward notifications to appropriate windows
+    // Backend connection
     Connections {
         target: backend
         
@@ -227,15 +280,11 @@ ApplicationWindow {
         }
         
         function onNotificationRequested(message, notificationType) {
-            console.log("Notification signal received:", message, notificationType)
-            
-            // Show in appropriate window based on what's visible
             if (settingsWindow.visible) {
                 settingsWindow.showNotification(message, notificationType)
             } else if (apiKeyWindow.visible) {
                 apiKeyWindow.showNotification(message, notificationType)
             } else {
-                // Show in main window if no other window is open
                 mainNotification.showNotification(message, notificationType)
             }
         }
