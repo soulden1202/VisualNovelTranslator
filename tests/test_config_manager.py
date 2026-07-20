@@ -18,9 +18,15 @@ class TestConfigManager:
         return str(config_file)
     
     @pytest.fixture
-    def config_manager(self, temp_config_file):
+    def temp_prompt_file(self, tmp_path):
+        """Create a temporary prompt file path for testing"""
+        prompt_file = tmp_path / "test_prompt.txt"
+        return str(prompt_file)
+
+    @pytest.fixture
+    def config_manager(self, temp_config_file, temp_prompt_file):
         """Create a ConfigManager instance with temp file"""
-        return ConfigManager(config_file=temp_config_file)
+        return ConfigManager(config_file=temp_config_file, prompt_file=temp_prompt_file)
     
     def test_load_config_creates_default(self, config_manager):
         """Test that loading non-existent config returns defaults"""
@@ -94,13 +100,13 @@ class TestConfigManager:
         width = config_manager.get('window_width')
         assert width == 1500
     
-    def test_config_persistence(self, config_manager, temp_config_file):
+    def test_config_persistence(self, config_manager, temp_config_file, temp_prompt_file):
         """Test that config persists across multiple loads"""
         config_manager.set('window_width', 1300)
         config_manager.set('text_size', 22)
         
         # Create new manager instance with same file
-        new_manager = ConfigManager(config_file=temp_config_file)
+        new_manager = ConfigManager(config_file=temp_config_file, prompt_file=temp_prompt_file)
         
         # Verify values persisted
         assert new_manager.get('window_width') == 1300
@@ -116,3 +122,31 @@ class TestConfigManager:
         config = config_manager.load_config()
         assert config is not None
         assert 'window_width' in config
+
+    def test_prompt_txt_creation_and_sync(self, config_manager, temp_prompt_file):
+        """Test that prompt.txt is created with defaults and syncs correctly"""
+        # 1. First load should create prompt.txt
+        assert not os.path.exists(temp_prompt_file)
+        config = config_manager.load_config()
+        assert os.path.exists(temp_prompt_file)
+        
+        with open(temp_prompt_file, 'r', encoding='utf-8') as f:
+            prompt_content = f.read()
+        assert prompt_content == config['prompt']
+        
+        # 2. Modify prompt.txt externally, and check that loading config updates prompt
+        new_prompt = "Translate all visual novel text to French"
+        with open(temp_prompt_file, 'w', encoding='utf-8') as f:
+            f.write(new_prompt)
+            
+        config2 = config_manager.load_config()
+        assert config2['prompt'] == new_prompt
+        
+        # 3. Saving config updates prompt.txt
+        new_prompt2 = "Translate all visual novel text to German"
+        config2['prompt'] = new_prompt2
+        config_manager.save_config(config2)
+        
+        with open(temp_prompt_file, 'r', encoding='utf-8') as f:
+            prompt_content2 = f.read()
+        assert prompt_content2 == new_prompt2

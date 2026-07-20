@@ -104,3 +104,4 @@ api_keys.json
 # mypy
 .mypy_cache/
 config.json
+prompt.txt

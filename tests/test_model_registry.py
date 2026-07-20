@@ -69,6 +69,44 @@ class TestModelRegistry:
             # Check translator class is callable
             assert callable(translator_class)
             
-            # Check API key name is a string
-            assert isinstance(api_key_name, str)
-            assert api_key_name.endswith('_API_KEY')
+            # Check API key name is a string or None
+            if api_key_name is not None:
+                assert isinstance(api_key_name, str)
+                assert api_key_name.endswith('_API_KEY')
+                
+    def test_local_llm_registration(self):
+        """Test that Local LLM is registered correctly"""
+        assert 'Local LLM' in ModelRegistry.get_model_names()
+        assert ModelRegistry.get_api_key_name('Local LLM') is None
+        
+    def test_create_translator_local_llm(self):
+        """Test that creating local LLM translator works without API key"""
+        from src.translators.local_llm_module import LocalLLMTranslator
+        translator = ModelRegistry.create_translator('Local LLM', 'test prompt', None)
+        assert isinstance(translator, LocalLLMTranslator)
+        assert translator.context == 'test prompt'
+
+    def test_local_llm_translator_translation(self, monkeypatch):
+        """Test that LocalLLMTranslator translates text correctly by mocking OpenAI client"""
+        from src.translators.local_llm_module import LocalLLMTranslator
+        
+        class MockChoice:
+            def __init__(self):
+                class MockMessage:
+                    content = "Mocked English translation"
+                self.message = MockMessage()
+                
+        class MockResponse:
+            choices = [MockChoice()]
+            
+        def mock_create(*args, **kwargs):
+            return MockResponse()
+            
+        # Initialize translator
+        translator = LocalLLMTranslator(None, "You are a translator.")
+        
+        # Monkeypatch the completions.create method
+        monkeypatch.setattr(translator.client.chat.completions, "create", mock_create)
+        
+        translation = translator.translate_text("日本語")
+        assert translation == "Mocked English translation"
