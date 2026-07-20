@@ -2,15 +2,47 @@
 Backend class handling translation logic and Qt signal/slot communication
 """
 
+import os
 import re
 import textwrap
 import threading
-import subprocess
+import ctypes
+from ctypes import wintypes
 from PyQt6.QtCore import QObject, pyqtSignal, pyqtSlot, QVariant
 from PyQt6.QtGui import QGuiApplication
 import pyperclip
+import psutil
 
 from src.translators.model_registry import ModelRegistry
+from src.core.textractor_hooker import TextractorHooker
+
+
+def _get_visible_window_titles():
+    """Map pid -> first visible top-level window title. Used to narrow the
+    process picker down to things that look like actual running programs
+    (games, VN players) instead of every background process on the system."""
+    user32 = ctypes.windll.user32
+    titles = {}
+
+    @ctypes.WINFUNCTYPE(ctypes.c_bool, wintypes.HWND, wintypes.LPARAM)
+    def enum_handler(hwnd, lparam):
+        if not user32.IsWindowVisible(hwnd):
+            return True
+        length = user32.GetWindowTextLengthW(hwnd)
+        if length == 0:
+            return True
+        buff = ctypes.create_unicode_buffer(length + 1)
+        user32.GetWindowTextW(hwnd, buff, length + 1)
+        title = buff.value.strip()
+        if not title:
+            return True
+        pid = wintypes.DWORD()
+        user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+        titles.setdefault(pid.value, title)
+        return True
+
+    user32.EnumWindows(enum_handler, 0)
+    return titles
 
 
 class Backend(QObject):
@@ -22,9 +54,14 @@ class Backend(QObject):
         self.translator_lock = threading.Lock()
         self.running = False
         
+        config = self.config_manager.load_config()
+        self.textractor_path = config.get('textractor_path', '')
+        self.hooker = None
+        
     # Signals
     translatedText = pyqtSignal(str)
     notificationRequested = pyqtSignal(str, str)
+    threadsChanged = pyqtSignal()
 
     def split_japanese_english(self, text):
         """Split text into Japanese and English parts"""
@@ -67,8 +104,17 @@ class Backend(QObject):
         self.notificationRequested.emit(message, notification_type)
     
     def get_clipboard_text(self):
-        """Get text from clipboard using PowerShell"""
-        return subprocess.getoutput("powershell.exe -Command Get-Clipboard")
+        """Get text from clipboard"""
+        # Was: subprocess.getoutput("powershell.exe -Command Get-Clipboard").
+        # That pipes PowerShell's stdout through the console's legacy OEM
+        # codepage rather than UTF-8, so any Japanese text got replaced with
+        # literal "?" characters before Python ever saw it. pyperclip reads
+        # the clipboard directly via the Win32 API in proper Unicode.
+        try:
+            return pyperclip.paste()
+        except Exception as e:
+            print(f"Error reading clipboard: {e}")
+            return ""
     
     def reinitialize_translator(self):
         """Reinitialize the translator with current config"""
@@ -88,6 +134,11 @@ class Backend(QObject):
             except Exception as e:
                 print(f"Error reinitializing translator: {e}")
                 self.translator = None
+                # This used to be console-only, so a boot-time init failure
+                # (e.g. selected model has no API key set) looked like
+                # "nothing is happening" with no indication why, until the
+                # user happened to re-save settings and trigger this again.
+                self.show_notification(f"Failed to load {selected_model}: {e}", "error")
                 return False
         
     def bootUp(self):
@@ -128,6 +179,8 @@ class Backend(QObject):
     def close_button(self):
         """Handle close button click"""
         self.running = False
+        if self.hooker:
+            self.hooker.stop()
         QGuiApplication.quit()
     
     @pyqtSlot(int, int, int, str, str)
@@ -145,6 +198,113 @@ class Backend(QObject):
             self.show_notification("Successfully saved settings", "success")
         else:
             self.show_notification("Failed to save settings", "error")
+
+    @pyqtSlot(str, str)
+    def save_local_llm_settings(self, url, model):
+        """Save local LLM settings to config"""
+        config = self.config_manager.load_config()
+        config['local_llm_url'] = url
+        config['local_llm_model'] = model
+        success = self.config_manager.save_config(config)
+        if success:
+            self.show_notification("Successfully saved Local LLM settings", "success")
+        else:
+            self.show_notification("Failed to save Local LLM settings", "error")
+
+    @pyqtSlot(str)
+    def save_textractor_path(self, path):
+        """Save Textractor path to config"""
+        config = self.config_manager.load_config()
+        config['textractor_path'] = path
+        self.textractor_path = path
+        success = self.config_manager.save_config(config)
+        if success:
+            self.show_notification("Successfully saved Textractor path", "success")
+        else:
+            self.show_notification("Failed to save Textractor path", "error")
+
+    @pyqtSlot(result=QVariant)
+    def get_running_processes(self):
+        processes = []
+        try:
+            own_pid = os.getpid()
+            for pid, title in _get_visible_window_titles().items():
+                if pid == own_pid:
+                    continue
+                try:
+                    name = psutil.Process(pid).name()
+                except (psutil.NoSuchProcess, psutil.AccessDenied):
+                    continue
+                processes.append(f"{name} - {title} ({pid})")
+        except Exception as e:
+            print(f"Error getting processes: {e}")
+        return sorted(list(set(processes)), key=lambda x: x.lower())
+
+    @pyqtSlot(int)
+    def attach_process(self, pid):
+        if not self.textractor_path:
+            self.show_notification("Please set Textractor path in settings first", "error")
+            return
+            
+        if self.hooker:
+            self.hooker.stop()
+            
+        try:
+            self.hooker = TextractorHooker(self.textractor_path)
+            self.hooker.on_text_hooked = self.handle_hooked_text
+            self.hooker.on_thread_list_changed = lambda: self.threadsChanged.emit()
+            self.hooker.on_process_exited = self.handle_hooker_exited
+            self.hooker.attach(pid)
+            self.show_notification(f"Attached to process {pid}", "success")
+        except Exception as e:
+            self.show_notification(f"Failed to attach: {e}", "error")
+
+    def handle_hooker_exited(self, reason):
+        """Called from the hooker's background thread when TextractorCLI dies unexpectedly"""
+        self.show_notification(f"Textractor disconnected: {reason}", "error")
+        self.threadsChanged.emit()
+
+    @pyqtSlot(str)
+    def send_textractor_command(self, cmd):
+        """Send a raw command to TextractorCLI, e.g. a manual hook code when auto-hook fails"""
+        if self.hooker:
+            self.hooker.send_command(cmd if cmd.endswith("\n") else cmd + "\n")
+
+    @pyqtSlot()
+    def detach_process(self):
+        if self.hooker:
+            self.hooker.stop()
+            self.hooker = None
+            self.show_notification("Detached from process", "success")
+            self.threadsChanged.emit()
+
+    @pyqtSlot(result=QVariant)
+    def get_active_threads(self):
+        if not self.hooker:
+            return []
+        threads = []
+        for thread_key, info in self.hooker.active_threads.items():
+            # Include latest text snippet for context -- wide enough to tell
+            # a full-sentence hook apart from a per-character/fragment one
+            snippet = info['last_text'][:80] + '...' if len(info['last_text']) > 80 else info['last_text']
+            threads.append(f"{thread_key} - {info['name']} [{snippet}]")
+        return threads
+
+    @pyqtSlot(str)
+    def select_thread(self, thread_key_str):
+        if not self.hooker:
+            return
+        key = thread_key_str.split(" - ")[0]
+        self.hooker.selected_thread_id = key
+        self.show_notification(f"Selected thread {key}", "success")
+
+    def handle_hooked_text(self, text):
+        with self.translator_lock:
+            if self.translator:
+                new_translated_text = self.translator.translate_text(text)
+            else:
+                new_translated_text = "Translator not initialized - check API key"
+        self.updater(new_translated_text)
     
     @pyqtSlot(str)
     def save_prompt(self, prompt):

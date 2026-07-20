@@ -5,6 +5,7 @@ Add new models here to make them available in the settings
 
 from src.translators.gemini_module import GeminiTranslator
 from src.translators.deepseek_module import DeepSeekTranslator
+from src.translators.local_llm_module import LocalLLMTranslator
 
 
 class ModelRegistry:
@@ -15,8 +16,7 @@ class ModelRegistry:
     MODELS = {
         'Gemini': (GeminiTranslator, 'GEMINI_API_KEY'),
         'DeepSeek': (DeepSeekTranslator, 'DEEPSEEK_API_KEY'),
-        # Add new models here:
-        # 'ModelName': (ModelClass, 'API_KEY_NAME'),
+        'Local LLM': (LocalLLMTranslator, None),
     }
     
     @classmethod
@@ -37,9 +37,9 @@ class ModelRegistry:
         if model_name not in cls.MODELS:
             raise ValueError(f"Unknown model: {model_name}. Available models: {cls.get_model_names()}")
         
-        translator_class, _ = cls.MODELS[model_name]
+        translator_class, api_key_name = cls.MODELS[model_name]
         
-        if not api_key:
+        if api_key_name and not api_key:
             raise ValueError(f"API key not set for {model_name}. Please add it in Settings > API Keys.")
         
         return translator_class(api_key, prompt)
@@ -52,4 +52,4 @@ class ModelRegistry:
     @classmethod
     def get_all_required_keys(cls):
         """Get all API key names required by registered models"""
-        return list(set(key_name for _, key_name in cls.MODELS.values()))
+        return list(set(key_name for _, key_name in cls.MODELS.values() if key_name))

@@ -44,6 +44,9 @@ def main():
         root.setProperty('llmPrompt', config['prompt'])
         root.setProperty('selectedModel', config['selected_model'])
         root.setProperty('availableModels', ModelRegistry.get_model_names())
+        root.setProperty('localLlmUrl', config.get('local_llm_url', 'http://localhost:11434/v1'))
+        root.setProperty('localLlmModel', config.get('local_llm_model', 'gemma2'))
+        root.setProperty('textractorPath', config.get('textractor_path', ''))
         
         # Set backend
         back_end = Backend(config_mgr, api_key_mgr)
